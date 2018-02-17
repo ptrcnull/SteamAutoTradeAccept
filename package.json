@@ -1,0 +1,17 @@
+{
+  "name": "steamautotradeaccept",
+  "version": "0.0.1",
+  "description": "Auto accept trades on Steam",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Bjornskjald <github@bjorn.ml>",
+  "license": "MIT",
+  "dependencies": {
+    "steam-totp": "^2.0.1",
+    "steam-tradeoffer-manager": "^2.9.3",
+    "steam-user": "^3.25.1",
+    "steamcommunity": "^3.34.1"
+  }
+}

@@ -8,9 +8,9 @@ const client = new SteamUser()
 const community = new SteamCommunity()
 
 const manager = new TradeOfferManager({
-	steam: client,
-	community: community,
-	language: 'en'
+  steam: client,
+  community: community,
+  language: 'en'
 })
 
 logOnOptions.twoFactorCode = SteamTotp.generateAuthCode(logOnOptions.secret)

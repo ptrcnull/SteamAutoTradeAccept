@@ -1,6 +1,18 @@
 const SteamTradeOffers = require('steam-tradeoffers')
-const config = require('./config.json')
+var handledOffers = []
+var config
+try {
+  config = require('./config.json')
+} catch (e) {
+  config = {
+    sessionID: process.env.STEAM_SESSIONID,
+    webCookie: process.env.STEAM_WEBCOOKIE,
+    APIKey: process.env.STEAM_APIKEY
+  }
+}
+
 var offers = new SteamTradeOffers()
+
 offers.setup({
   sessionID: config.sessionID,
   webCookie: config.webCookie.split('; '),

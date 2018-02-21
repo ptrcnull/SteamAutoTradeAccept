@@ -4,7 +4,8 @@
   "description": "Auto accept trades on Steam",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
   },
   "author": "Bjornskjald <github@bjorn.ml>",
   "license": "MIT",

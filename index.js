@@ -3,12 +3,14 @@ var handledOffers = []
 var config
 try {
   config = require('./config.json')
+  console.log(config)
 } catch (e) {
   config = {
     sessionID: process.env.STEAM_SESSIONID,
     webCookie: process.env.STEAM_WEBCOOKIE,
     APIKey: process.env.STEAM_APIKEY
   }
+  console.log(config)
 }
 
 var offers = new SteamTradeOffers()

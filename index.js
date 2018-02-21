@@ -36,7 +36,7 @@ function handleOffers () {
       body.response.descriptions.forEach(desc => { descriptions[`${desc.appid};${desc.classid};${desc.instanceid}`] = desc })
       body.response.trade_offers_received.forEach(offer => {
         if (offer.trade_offer_state !== 2 || handledOffers.includes(offer.tradeofferid)) return
-        
+
         handledOffers.push(offer.tradeofferid)
 
         console.log(`Got an offer ${offer.tradeofferid} from ${offer.steamid_other}`)

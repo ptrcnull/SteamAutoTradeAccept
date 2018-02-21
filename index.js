@@ -33,7 +33,9 @@ function handleOffers () {
       body.response.descriptions = body.response.descriptions || []
       body.response.descriptions.forEach(desc => { descriptions[`${desc.appid};${desc.classid};${desc.instanceid}`] = desc })
       body.response.trade_offers_received.forEach(offer => {
-        if (offer.trade_offer_state !== 2) return
+        if (offer.trade_offer_state !== 2 || handledOffers.includes(offer.tradeofferid)) return
+        
+        handledOffers.push(offer.tradeofferid)
 
         console.log(`Got an offer ${offer.tradeofferid} from ${offer.steamid_other}`)
 
@@ -53,27 +55,10 @@ function handleOffers () {
             }).join(', ') + '\n')
         }
 
-        if (offer.message && offer.message !== '') {
-          console.log('Message: ' + offer.message)
-        }
+        if (offer.message && offer.message !== '') console.log('Message: ' + offer.message)
 
-        if (!offer.items_to_give) {
-          offers.acceptOffer({
-            tradeOfferId: offer.tradeofferid,
-            partnerSteamId: offer.steamid_other
-          }, (err, result) => {
-            if (err) return console.error(err)
-
-            console.log('Offer ' + offer.tradeofferid + ' accepted')
-
-            offers.getOffer({tradeofferid: offer.tradeofferid}, (err, result) => {
-              if (err) return console.error(err)
-
-              if (result && result.response && result.response.offer && result.response.offer.tradeid) {
-                offers.getItems({tradeId: result.response.offer.tradeid}, (err, result) => console.log(err || 'Got items:\n' + result.map(item => `http://steamcommunity.com/profiles/${item.owner}/inventory/#${item.appid}_${item.contextid}_${item.id}`).join('\n')))
-              }
-            })
-          })
+        if (!offer.items_to_give || offer.is_our_offer) {
+          offers.acceptOffer({tradeOfferId: offer.tradeofferid, partnerSteamId: offer.steamid_other}, (err, result) => console.log(err || 'Offer ' + offer.tradeofferid + ' accepted'))
         } else {
           offers.declineOffer({tradeOfferId: offer.tradeofferid}, (err, result) => console.log(err || 'Offer ' + offer.tradeofferid + ' declined'))
         }

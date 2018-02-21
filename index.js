@@ -18,7 +18,7 @@ var offers = new SteamTradeOffers()
 offers.setup({
   sessionID: config.sessionID,
   webCookie: config.webCookie.split('; '),
-  APIKey: config.apiKey
+  APIKey: config.APIKey
 })
 
 function handleOffers () {

@@ -1,38 +1,73 @@
-const SteamUser = require('steam-user')
-const SteamTotp = require('steam-totp')
-const SteamCommunity = require('steamcommunity')
-const TradeOfferManager = require('steam-tradeoffer-manager')
-
-var logOnOptions = require('./config.json')
-const client = new SteamUser()
-const community = new SteamCommunity()
-
-const manager = new TradeOfferManager({
-  steam: client,
-  community: community,
-  language: 'en'
+const SteamTradeOffers = require('steam-tradeoffers')
+const config = require('./config.json')
+var offers = new SteamTradeOffers()
+offers.setup({
+  sessionID: config.sessionID,
+  webCookie: config.webCookie.split('; '),
+  APIKey: config.apiKey
 })
 
-logOnOptions.twoFactorCode = SteamTotp.generateAuthCode(logOnOptions.secret)
+function handleOffers () {
+  offers.getOffers({
+    get_received_offers: 1,
+    active_only: 1,
+    time_historical_cutoff: Math.round(Date.now() / 1000),
+    get_descriptions: 1
+  }, (err, body) => {
+    if (err) return console.error(err)
 
-client.logOn(logOnOptions)
+    if (body && body.response && body.response.trade_offers_received) {
+      var descriptions = {}
+      body.response.descriptions = body.response.descriptions || []
+      body.response.descriptions.forEach(desc => { descriptions[`${desc.appid};${desc.classid};${desc.instanceid}`] = desc })
+      body.response.trade_offers_received.forEach(offer => {
+        if (offer.trade_offer_state !== 2) return
 
-client.on('loggedOn', () => {
-  console.log('Logged into Steam')
-  client.setPersona(SteamUser.Steam.EPersonaState.Online)
-})
+        console.log(`Got an offer ${offer.tradeofferid} from ${offer.steamid_other}`)
 
-client.on('webSession', (sessionid, cookies) => {
-  manager.setCookies(cookies)
+        if (offer.items_to_receive) {
+          console.log('Items to receive: ' +
+            offer.items_to_receive.map(item => {
+              var desc = descriptions[`${item.appid};${item.classid};${item.instanceid}`]
+              return desc.name + ' (' + desc.type + ')'
+            }).join(', ') + '\n')
+        }
 
-  community.setCookies(cookies)
-  community.startConfirmationChecker(10000, logOnOptions.secret);
-})
+        if (offer.items_to_give) {
+          console.log('Items to give: ' +
+            offer.items_to_give.map(item => {
+              var desc = descriptions[`${item.appid};${item.classid};${item.instanceid}`]
+              return desc.name + ' (' + desc.type + ')'
+            }).join(', ') + '\n')
+        }
 
-manager.on('newOffer', offer => {
-  if (offer.itemsToGive.length === 0) {
-    offer.accept((err, status) => {
-      console.log(err || `Accepted offer. Status: ${status}.`)
-    })
-  }
-})
+        if (offer.message && offer.message !== '') {
+          console.log('Message: ' + offer.message)
+        }
+
+        if (!offer.items_to_give) {
+          offers.acceptOffer({
+            tradeOfferId: offer.tradeofferid,
+            partnerSteamId: offer.steamid_other
+          }, (err, result) => {
+            if (err) return console.error(err)
+
+            console.log('Offer ' + offer.tradeofferid + ' accepted')
+
+            offers.getOffer({tradeofferid: offer.tradeofferid}, (err, result) => {
+              if (err) return console.error(err)
+
+              if (result && result.response && result.response.offer && result.response.offer.tradeid) {
+                offers.getItems({tradeId: result.response.offer.tradeid}, (err, result) => console.log(err || 'Got items:\n' + result.map(item => `http://steamcommunity.com/profiles/${item.owner}/inventory/#${item.appid}_${item.contextid}_${item.id}`).join('\n')))
+              }
+            })
+          })
+        } else {
+          offers.declineOffer({tradeOfferId: offer.tradeofferid}, (err, result) => console.log(err || 'Offer ' + offer.tradeofferid + ' declined'))
+        }
+      })
+    }
+  })
+}
+
+setInterval(handleOffers, 1000)

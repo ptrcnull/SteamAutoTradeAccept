@@ -1,8 +1,6 @@
 {
-	"account_name": "",
+	"username": "",
 	"password": "",
-	"APIKey": "",
-  "sentryFile": "",
-  "authCode": "",
-  "__comment": "Auth code is only required if there is no sentry file"
+  "sharedSecret": "",
+	"APIKey": ""
 }

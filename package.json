@@ -10,6 +10,7 @@
   "author": "Bjornskjald <github@bjorn.ml>",
   "license": "MIT",
   "dependencies": {
+    "chalk": "^2.3.1",
     "steam-tradeoffers": "^3.1.0"
   }
 }

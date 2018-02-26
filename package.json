@@ -1,6 +1,6 @@
 {
   "name": "steamautotradeaccept",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Auto accept trades on Steam",
   "main": "index.js",
   "scripts": {

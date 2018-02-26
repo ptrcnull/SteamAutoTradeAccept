@@ -1,16 +1,17 @@
 {
   "name": "steamautotradeaccept",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Auto accept trades on Steam",
-  "main": "index.js",
+  "main": "standalone.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
+    "start": "node standalone"
   },
   "author": "Bjornskjald <github@bjorn.ml>",
   "license": "MIT",
   "dependencies": {
     "chalk": "^2.3.1",
-    "steam-tradeoffers": "^3.1.0"
+    "steam-tradeoffers": "^3.1.0",
+    "steam-user": "^3.25.1"
   }
 }

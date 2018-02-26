@@ -1,28 +1,7 @@
-const SteamTradeOffers = require('steam-tradeoffers')
 const chalk = require('chalk')
 var handledOffers = []
-var config
-try {
-  config = require('./config.json')
-  console.log(config)
-} catch (e) {
-  config = {
-    sessionID: process.env.STEAM_SESSIONID,
-    webCookie: process.env.STEAM_WEBCOOKIE,
-    APIKey: process.env.STEAM_APIKEY
-  }
-  console.log(config)
-}
 
-var offers = new SteamTradeOffers()
-
-offers.setup({
-  sessionID: config.sessionID,
-  webCookie: config.webCookie.split('; '),
-  APIKey: config.APIKey
-})
-
-function handleOffers () {
+module.exports = offers => {
   offers.getOffers({
     get_received_offers: 1,
     active_only: 1,
@@ -66,5 +45,3 @@ function handleOffers () {
     }
   })
 }
-
-setInterval(handleOffers, 1000)

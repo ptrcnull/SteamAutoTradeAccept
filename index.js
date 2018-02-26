@@ -1,4 +1,5 @@
 const SteamTradeOffers = require('steam-tradeoffers')
+const chalk = require('chalk')
 var handledOffers = []
 var config
 try {
@@ -34,35 +35,32 @@ function handleOffers () {
       var descriptions = {}
       body.response.descriptions = body.response.descriptions || []
       body.response.descriptions.forEach(desc => { descriptions[`${desc.appid};${desc.classid};${desc.instanceid}`] = desc })
-      body.response.trade_offers_received.forEach(offer => {
-        if (offer.trade_offer_state !== 2 || handledOffers.includes(offer.tradeofferid)) return
-
+      var offersList = body.response.trade_offers_received.filter(offer => offer.trade_offer_state === 2 && !(handledOffers.includes(offer.tradeofferid)))
+      offersList.forEach(offer => {
         handledOffers.push(offer.tradeofferid)
 
-        console.log(`Got an offer ${offer.tradeofferid} from ${offer.steamid_other}`)
+        console.log(chalk.blue('Got an offer'), offer.tradeofferid, chalk.blue('from'), offer.steamid_other)
 
         if (offer.items_to_receive) {
           console.log('Items to receive: ' +
             offer.items_to_receive.map(item => {
               var desc = descriptions[`${item.appid};${item.classid};${item.instanceid}`]
-              return desc.name + ' (' + desc.type + ')'
-            }).join(', ') + '\n')
+              return chalk.green(desc.name + ' (' + desc.type + ')')
+            }).join(', '))
         }
 
         if (offer.items_to_give) {
           console.log('Items to give: ' +
             offer.items_to_give.map(item => {
               var desc = descriptions[`${item.appid};${item.classid};${item.instanceid}`]
-              return desc.name + ' (' + desc.type + ')'
-            }).join(', ') + '\n')
+              return chalk.red(desc.name + ' (' + desc.type + ')')
+            }).join(', '))
         }
 
-        if (offer.message && offer.message !== '') console.log('Message: ' + offer.message)
+        if (offer.message && offer.message !== '') console.log(chalk.blue('Message:'), offer.message, '\n')
 
         if (!offer.items_to_give || offer.is_our_offer) {
-          offers.acceptOffer({tradeOfferId: offer.tradeofferid, partnerSteamId: offer.steamid_other}, (err, result) => console.log(err || 'Offer ' + offer.tradeofferid + ' accepted'))
-        } else {
-          offers.declineOffer({tradeOfferId: offer.tradeofferid}, (err, result) => console.log(err || 'Offer ' + offer.tradeofferid + ' declined'))
+          offers.acceptOffer({tradeOfferId: offer.tradeofferid, partnerSteamId: offer.steamid_other}, (err, result) => console.log(err || chalk.green('Offer ' + offer.tradeofferid + ' accepted')))
         }
       })
     }
